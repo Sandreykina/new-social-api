@@ -71,6 +71,7 @@ app.post("/api/posts", jsonParser, function (req, res) {
     fs.writeFileSync("posts.json", data);
     res.send(post);
 });
+
 // удаление поста по id
 app.delete("/api/posts/:id", function (req, res) {
 
@@ -101,7 +102,6 @@ app.delete("/api/posts/:id", function (req, res) {
 // изменение лайка
 app.put("/api/posts/:id", jsonParser, function (req, res) {
     const postId = req.params.id;
-
     let data = fs.readFileSync(filePath, "utf8");
     const posts = JSON.parse(data);
     let post;
@@ -124,7 +124,61 @@ app.put("/api/posts/:id", jsonParser, function (req, res) {
     }
 });
 
+// добавление комментария
+app.post("/api/posts/:id", jsonParser, function (req, res) {
+   
+    if (!req.body) return res.sendStatus(400);
+    const postId = req.params.id;
 
-app.listen(5000, function () {
-    console.log(`Сервер бэка азпущен с портом 5000}`);
+    let data = fs.readFileSync(filePath, "utf8");
+    const posts = JSON.parse(data);
+    let post;
+    for (var i = 0; i < posts.length; i++) {
+        if (posts[i].id == postId) {
+            post = posts[i];
+            break;
+        }
+    }
+    const commentAuthor = req.body.name;
+    const commentText = req.body.comment;
+    // находим максимальный id коммента
+    const id = Math.max.apply(Math, post.comments.map(function (o) { return o.id; }))
+    // увеличиваем его на единицу
+    const comment = { id: id + 1, name: commentAuthor, comment: commentText };
+    // добавляем коммент в массив
+    post.comments.push(comment);
+    data = JSON.stringify(posts);
+    // перезаписываем файл с новыми данными
+    fs.writeFileSync("posts.json", data);
+    res.send(post);
+});
+
+//изменение поста
+// app.put("/api/posts/:id", jsonParser, function (req, res) {
+//     const postId = req.params.id;
+//     let data = fs.readFileSync(filePath, "utf8");
+//     const posts = JSON.parse(data);
+//     let post;
+//     for (var i = 0; i < posts.length; i++) {
+//         if (posts[i].id == postId) {
+//             post = posts[i];
+//             break;
+//         }
+//     }
+//     // изменяем данные поста
+//     if (post) {
+//         post.likeCount = post.isLiked ? post.likeCount - 1 : post.likeCount + 1;
+//         post.isLiked = !post.isLiked;
+//         data = JSON.stringify(posts);
+//         fs.writeFileSync("posts.json", data);
+//         res.send(post);
+//     }
+//     else {
+//         res.status(404).send(post);
+//     }
+// });
+
+const port = 5000;
+app.listen(port, function () {
+    console.log(`Сервер бэка азпущен с портом ${port}`);
 });
