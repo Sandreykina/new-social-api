@@ -1,7 +1,4 @@
-here is projct
+This is a backend only on the local machine
 
-https://sandreykina.github.io/new-social/
-
-and here is backend, only on local machine
-
-https://github.com/Sandreykina/new-social-api
+here is frontend
+https://github.com/Sandreykina/new-social
